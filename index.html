@@ -3,159 +3,174 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Overtime Money Tracker</title>
+  <title>Overtime Tracker</title>
   <style>
     :root {
-      --bg: #0d1117;
-      --text: #e6edf3;
-      --text-muted: #8b949e;
-      --primary: #2ea043;
-      --accent: #1f6feb;
+      --bg: #1c1c28;
+      --surface: #2a2a3c;
+      --text: #e1e1e9;
+      --text-muted: #9a9ab0;
+      --primary: #8f4fff;
+      --danger: #f85149;
     }
+
     * {
       box-sizing: border-box;
     }
+
     body {
       margin: 0;
+      padding: 24px 16px;
+      font-family: 'Segoe UI', Roboto, Arial, sans-serif;
       background-color: var(--bg);
       color: var(--text);
-      font-family: 'Segoe UI', Roboto, Arial, sans-serif;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: flex-start;
-      min-height: 100vh;
-      padding: 24px 16px;
       text-align: center;
+      min-height: 100vh;
     }
-    .local-time, .timer, .money {
-      margin-bottom: 8px;
-    }
+
     .local-time {
       font-size: 0.9rem;
       color: var(--text-muted);
+      margin-bottom: 12px;
     }
+
+    .image-placeholder {
+      width: 150px;
+      height: 100px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      background-image: url('https://cdn.wheel-size.com/thumbs/54/8a/548ad7755b0f5588e13efa78d3660f04.jpg');
+      background-size: cover;
+      background-position: center;
+    }
+
     .timer {
-      font-size: 1.2rem;
+      font-size: 3rem;
+      font-weight: bold;
+      margin-bottom: 24px;
     }
-    .money {
-      font-size: 2.5rem;
-      font-weight: 700;
-      color: var(--primary);
-      margin: 20px 0;
-    }
-    .buttons {
+
+    .controls {
       display: flex;
-      flex-direction: row;
-      gap: 12px;
-      flex-wrap: wrap;
-      justify-content: center;
-      margin: 24px 0;
+      gap: 24px;
+      margin-bottom: 32px;
     }
-    .btn {
-      padding: 12px 20px;
-      border-radius: 8px;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.3s;
-      border: none;
-    }
-    .btn.start {
-      background-color: var(--primary);
-      color: #fff;
-    }
-    .btn.pause {
-      background-color: #30363d;
-      color: #fff;
-    }
-    .btn.stop {
-      background-color: transparent;
+
+    .control-btn {
+      background-color: var(--surface);
       border: 2px solid var(--primary);
       color: var(--primary);
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      font-size: 1.4rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
     }
-    .btn:hover {
-      opacity: 0.9;
+
+    .control-btn:hover {
+      background-color: #3a3a50;
+      transform: scale(1.05);
     }
+
     .popup {
       position: fixed;
       top: 50%;
       left: 50%;
-      transform: translate(-50%, -50%);
-      background-color: #161b22;
+      transform: translate(-50%, -50%) scale(0.95);
+      background-color: var(--surface);
       color: var(--text);
-      border: 1px solid #30363d;
-      padding: 20px;
-      border-radius: 12px;
+      border: 1px solid #4a4a5a;
+      padding: 24px;
+      border-radius: 16px;
       width: 90%;
       max-width: 400px;
       display: none;
       z-index: 1000;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      animation: bounceIn 0.4s ease forwards;
     }
+
+    @keyframes bounceIn {
+      0% { transform: translate(-50%, -50%) scale(0.95); opacity: 0; }
+      60% { transform: translate(-50%, -50%) scale(1.05); opacity: 1; }
+      100% { transform: translate(-50%, -50%) scale(1); }
+    }
+
     .popup h2 {
-      margin: 0 0 10px 0;
+      margin-top: 0;
       font-size: 1.4rem;
+      color: var(--primary);
+      line-height: 1.4;
     }
+
     .popup-money {
-      font-size: 2rem;
+      font-size: 3rem;
       font-weight: bold;
-      margin: 10px 0;
+      color: var(--text);
+      margin: 16px 0 12px;
     }
-    .popup-time {
-      font-size: 0.95rem;
+
+    .popup-time, .popup-hours {
+      font-size: 1rem;
       color: var(--text-muted);
+      margin-bottom: 8px;
     }
+
+    .restart-icon {
+      background-color: var(--surface);
+      border: 2px solid var(--primary);
+      color: var(--primary);
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      margin: 12px auto 0;
+    }
+
+    .restart-icon:hover {
+      background-color: #3a3a50;
+    }
+
     .close-btn {
       position: absolute;
       top: 10px;
-      right: 16px;
-      font-size: 1.2rem;
+      right: 15px;
       cursor: pointer;
       color: var(--text-muted);
-    }
-    .log-section {
-      margin-top: 40px;
-      width: 100%;
-      max-width: 480px;
-      text-align: left;
-    }
-    .log-section h3 {
-      border-bottom: 1px solid #30363d;
-      padding-bottom: 6px;
-      margin-bottom: 12px;
-      font-size: 1.1rem;
-      color: var(--text);
-    }
-    .log-entry {
-      font-size: 0.9rem;
-      color: var(--text);
-      padding: 4px 0;
+      font-size: 1.2rem;
     }
   </style>
 </head>
 <body>
   <div class="local-time" id="localTime">Local time 00:00</div>
-  <div class="timer" id="timer">Time: 00:00:00</div>
-  <div class="money" id="money">€0.00</div>
-  <div class="buttons">
-    <button class="btn start" onclick="startTimer()">Start</button>
-    <button class="btn pause" onclick="pauseTimer()">Pause</button>
-    <button class="btn stop" onclick="stopTimer()">Stop</button>
+  <div class="image-placeholder"></div>
+  <div class="timer" id="timer">00:00:00</div>
+  <div class="controls">
+    <button id="startPauseBtn" class="control-btn" onclick="toggleTimer()">▶</button>
+    <button class="control-btn" onclick="stopTimer()">✖</button>
   </div>
 
   <div class="popup" id="summaryPopup">
     <div class="close-btn" onclick="closePopup()">✖</div>
-    <h2>🎉 Nice work!</h2>
-    <p>You earned:</p>
+    <h2>ESO!<br>un poquito más cerca</h2>
     <div class="popup-money" id="popupMoney">€0.00</div>
     <div class="popup-time" id="popupTime">Session: --:-- → --:--</div>
-    <button class="btn pause" onclick="resetTimer(); closePopup();">Restart</button>
+    <div class="popup-hours" id="popupHours">Hours worked: 0.00</div>
+    <div class="restart-icon" onclick="resetTimer(); closePopup();">⟳</div>
   </div>
 
-  <div class="log-section">
-    <h3>This Week</h3>
-    <div id="logList"></div>
-  </div>
+  <audio id="victorySound" src="https://www.soundjay.com/button/sounds/button-09.mp3" preload="auto"></audio>
 
   <script>
     const hourlyRate = 41.75;
@@ -163,17 +178,6 @@
     let interval = null;
     let startTime = null;
     let endTime = null;
-    let wakeLock = null;
-
-    async function requestWakeLock() {
-      try {
-        if ('wakeLock' in navigator) {
-          wakeLock = await navigator.wakeLock.request('screen');
-        }
-      } catch (err) {
-        console.warn('Wake lock not supported:', err);
-      }
-    }
 
     function formatTime(sec) {
       const h = String(Math.floor(sec / 3600)).padStart(2, '0');
@@ -183,9 +187,7 @@
     }
 
     function updateDisplay() {
-      document.getElementById('timer').textContent = `Time: ${formatTime(seconds)}`;
-      const earnings = (hourlyRate / 3600) * seconds;
-      document.getElementById('money').textContent = `€${earnings.toFixed(2)}`;
+      document.getElementById('timer').textContent = formatTime(seconds);
     }
 
     function updateLocalTime() {
@@ -194,39 +196,21 @@
       document.getElementById('localTime').textContent = `Local time ${timeStr}`;
     }
 
-    function saveState() {
-      localStorage.setItem("overtimeTracker", JSON.stringify({ seconds, startTime: startTime ? startTime.toISOString() : null }));
-    }
-
-    function loadState() {
-      const saved = JSON.parse(localStorage.getItem("overtimeTracker"));
-      if (saved && saved.seconds) {
-        seconds = saved.seconds;
-        if (saved.startTime) {
-          startTime = new Date(saved.startTime);
-        }
-        updateDisplay();
-      }
-    }
-
-    function startTimer() {
-      if (!interval) {
+    function toggleTimer() {
+      const btn = document.getElementById('startPauseBtn');
+      if (interval) {
+        clearInterval(interval);
+        interval = null;
+        btn.textContent = '▶';
+      } else {
         if (!startTime) startTime = new Date();
         interval = setInterval(() => {
           seconds++;
           updateDisplay();
           updateLocalTime();
-          saveState();
         }, 1000);
-        requestWakeLock();
+        btn.textContent = '⏸';
       }
-    }
-
-    function pauseTimer() {
-      clearInterval(interval);
-      interval = null;
-      if (wakeLock) wakeLock.release();
-      saveState();
     }
 
     function stopTimer() {
@@ -234,16 +218,22 @@
         clearInterval(interval);
         interval = null;
       }
-      if (wakeLock) wakeLock.release();
       endTime = new Date();
       const earnings = (hourlyRate / 3600) * seconds;
-      document.getElementById('popupMoney').textContent = `€${earnings.toFixed(2)}`;
       const startStr = startTime ? startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '--:--';
       const endStr = endTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      document.getElementById('popupMoney').textContent = `€${earnings.toFixed(2)}`;
       document.getElementById('popupTime').textContent = `Session: ${startStr} → ${endStr}`;
-      logSession(startTime, endTime, earnings);
+      document.getElementById('popupHours').textContent = `Hours worked: ${(seconds / 3600).toFixed(2)}`;
       document.getElementById('summaryPopup').style.display = 'block';
-      localStorage.removeItem("overtimeTracker");
+
+      const audio = document.getElementById('victorySound');
+      if (audio) {
+        audio.currentTime = 0;
+        audio.load();
+        audio.play().catch(err => console.warn("Audio playback failed:", err));
+      }
     }
 
     function resetTimer() {
@@ -251,31 +241,17 @@
       interval = null;
       seconds = 0;
       startTime = null;
+      endTime = null;
       updateDisplay();
-      if (wakeLock) wakeLock.release();
-      localStorage.removeItem("overtimeTracker");
+      document.getElementById('startPauseBtn').textContent = '▶';
     }
 
     function closePopup() {
       document.getElementById('summaryPopup').style.display = 'none';
     }
 
-    function logSession(start, end, earnings) {
-      const day = start.toLocaleDateString(undefined, { weekday: 'short' });
-      const s = start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      const e = end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      const entry = `${day} ${s} → ${e} — €${earnings.toFixed(2)}`;
-      const logList = document.getElementById('logList');
-      const p = document.createElement('p');
-      p.className = 'log-entry';
-      p.textContent = entry;
-      logList.appendChild(p);
-    }
-
-    loadState();
     updateDisplay();
     updateLocalTime();
   </script>
 </body>
 </html>
-
